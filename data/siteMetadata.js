@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'Next.js Starter Blog',
   author: 'youngsik won',
   headerTitle: 'won-hope blog',
-  description: 'Daily Dev Log. 매일의 개발 기록',
+  description: 'Daily Dev Log.',
   language: 'ko-KR',
   theme: 'system', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
