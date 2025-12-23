@@ -8,8 +8,8 @@ const sortedPosts = allCoreContent(sortPosts(allBlogs))
 const totalPages = Math.ceil(sortedPosts.length / POSTS_PER_PAGE)
 
 export const generateStaticParams = async () => {
-  return Array.from({ length: totalPages }, (_, i) => ({ 
-    page: (i + 1).toString() 
+  return Array.from({ length: totalPages }, (_, i) => ({
+    page: (i + 1).toString(),
   }))
 }
 
