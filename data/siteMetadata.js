@@ -46,9 +46,9 @@ const siteMetadata = {
     // posthogAnalytics: {
     //   posthogProjectApiKey: '', // e.g. 123e4567-e89b-12d3-a456-426614174000
     // },
-    // googleAnalytics: {
-    //   googleAnalyticsId: '', // e.g. G-XXXXXXX
-    // },
+    googleAnalytics: {
+      googleAnalyticsId: 'G-QN08PK955F',
+    },
   },
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo, revue, emailoctopus, beehive
@@ -66,7 +66,7 @@ const siteMetadata = {
       // https://giscus.app/
       repo: 'won-hope/won-hope.github.io',
       repositoryId: 'R_kgDOPbD9hw',
-      category: 'General',
+      category: 'General',fgoo
       categoryId: 'DIC_kwDOPbD9h84C0K5-',
       mapping: 'pathname', // supported options: pathname, url, title
       reactions: '1', // Emoji reactions: 1 = enable / 0 = disable
