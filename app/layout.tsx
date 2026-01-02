@@ -27,9 +27,9 @@ export const metadata: Metadata = {
   description: siteMetadata.description,
 
   verification: {
-    google: 'qIEk0gBUekJqw2uiF_yX6zqUKXqAHAiALCOpFJjIBmo', // 예: 'aBcDeFgHiJk...'
+    google: 'qIEk0gBUekJqw2uiF_yX6zqUKXqAHAiALCOpFJjIBmo',
     other: {
-      'naver-site-verification': '네이버_서치어드바이저_코드_복사_붙여넣기', // 예: '1a2b3c...'
+      'naver-site-verification': '54a90be56b8796570dface33be659c98fabde277',
     },
   },
 
