@@ -7,8 +7,8 @@ const siteMetadata = {
     '기록은 나를 비추는 거울이자, 타인과 닿는 창(窓)입니다. 흐르는 소통을 통해 성장의 본질을 탐구하며, 메타인지의 지평을 넓히는 사유의 궤적을 남깁니다.',
   language: 'ko-KR',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
-  siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
+  siteUrl: 'https://won-hope.github.io',
+  siteRepo: 'https://github.com/won-hope/won-hope.github.io',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/hope.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.png`,
   mastodon: 'https://mastodon.social/@mastodonuser',
