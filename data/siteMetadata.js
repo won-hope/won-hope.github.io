@@ -1,9 +1,10 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'Next.js Starter Blog',
+  title: 'software developer won-hope',
   author: 'youngsik won',
   headerTitle: 'won-hope blog',
-  description: 'Daily Dev Log.',
+  description:
+    '기록은 나를 비추는 거울이자, 타인과 닿는 창(窓)입니다. 흐르는 소통을 통해 성장의 본질을 탐구하며, 메타인지의 지평을 넓히는 사유의 궤적을 남깁니다.',
   language: 'ko-KR',
   theme: 'system', // system, dark or light
   siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
@@ -24,7 +25,7 @@ const siteMetadata = {
   bluesky: 'https://bsky.app/',
   locale: 'ko-KR',
   // set to true if you want a navbar fixed to the top
-  stickyNav: false,
+  stickyNav: true,
   analytics: {
     // If you want to use an analytics provider you have to add it to the
     // content security policy in the `next.config.js` file.
