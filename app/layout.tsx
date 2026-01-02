@@ -25,13 +25,21 @@ export const metadata: Metadata = {
     template: `%s | ${siteMetadata.title}`,
   },
   description: siteMetadata.description,
+
+  verification: {
+    google: 'qIEk0gBUekJqw2uiF_yX6zqUKXqAHAiALCOpFJjIBmo', // 예: 'aBcDeFgHiJk...'
+    other: {
+      'naver-site-verification': '네이버_서치어드바이저_코드_복사_붙여넣기', // 예: '1a2b3c...'
+    },
+  },
+
   openGraph: {
     title: siteMetadata.title,
     description: siteMetadata.description,
     url: './',
     siteName: siteMetadata.title,
     images: [siteMetadata.socialBanner],
-    locale: 'en_US',
+    locale: 'ko_KR', // 👇 [2] 한국어로 변경 (기존: en_US)
     type: 'website',
   },
   alternates: {
@@ -67,6 +75,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${space_grotesk.variable} scroll-smooth`}
       suppressHydrationWarning
     >
+      {/* 파비콘을 hope.png로 잘 변경하셨습니다 👍 */}
       <link rel="apple-touch-icon" sizes="76x76" href={`${basePath}/static/images/hope.png`} />
       <link rel="icon" type="image/png" sizes="32x32" href={`${basePath}/static/images/hope.png`} />
       <link rel="icon" type="image/png" sizes="16x16" href={`${basePath}/static/images/hope.png`} />
@@ -80,13 +89,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
+
       <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
         <ThemeProviders>
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <SectionContainer>
             <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
               <Header />
-              <main className="mb-auto">{children}</main>
+
+              {/* 👇 [3] 고정 헤더 때문에 가려지지 않도록 pt-24 추가 (필수!) */}
+              <main className="mb-auto pt-24">{children}</main>
             </SearchProvider>
             <Footer />
           </SectionContainer>
