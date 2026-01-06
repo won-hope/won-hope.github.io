@@ -66,7 +66,7 @@ const siteMetadata = {
       // https://giscus.app/
       repo: 'won-hope/won-hope.github.io',
       repositoryId: 'R_kgDOPbD9hw',
-      category: 'General',fgoo
+      category: 'General',
       categoryId: 'DIC_kwDOPbD9h84C0K5-',
       mapping: 'pathname', // supported options: pathname, url, title
       reactions: '1', // Emoji reactions: 1 = enable / 0 = disable
