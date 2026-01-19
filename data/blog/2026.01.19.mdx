@@ -10,6 +10,31 @@ images: ['/static/images/ohana-architecture-v1.png']
 
 import Mermaid from './components/Mermaid'
 
+export const chartCode = `
+graph TD
+    subgraph Client [📱 Mobile App]
+        App[One-Tap UI]
+    end
+
+    subgraph Fast_Layer [⚡ Sync Layer]
+        Supa_DB[(Supabase DB)]
+        Trigger[⚡ Edge Function]
+    end
+
+    subgraph Google_Eco [🌐 Storage Layer]
+        G_Sheet[📊 Google Sheets<br/>(Main DB)]
+        G_Cal[📅 Google Calendar<br/>(Schedule DB)]
+    end
+
+    %% Flow
+    App -->|1. 기록 (Realtime)| Supa_DB
+    Supa_DB -->|2. 자동 백업 (Trigger)| Trigger
+    Trigger -->|3. Append Row| G_Sheet
+
+    App <-->|4. 일정 Read/Write| G_Cal
+
+`
+
 ## 👶 Introduction
 
 **"우리 도현이 저번 예방접종 언제 맞았지?", "이번 달 생활비 얼마나 남았어?"**
@@ -101,30 +126,7 @@ Supabase는 빠르고 편리하지만, **데이터의 최종 목적지는 항상
 
 전체 데이터 흐름과 아키텍처는 다음과 같다.
 
-<Mermaid chart={`
-graph TD
-    subgraph Client [📱 Mobile App]
-        App[One-Tap UI]
-    end
-
-    subgraph Fast_Layer [⚡ Sync Layer]
-        Supa_DB[(Supabase DB)]
-        Trigger[⚡ Edge Function]
-    end
-
-    subgraph Google_Eco [🌐 Storage Layer]
-        G_Sheet[📊 Google Sheets<br/>(Main DB)]
-        G_Cal[📅 Google Calendar<br/>(Schedule DB)]
-    end
-
-    %% Flow
-    App -->|1. 기록 (Realtime)| Supa_DB
-    Supa_DB -->|2. 자동 백업 (Trigger)| Trigger
-    Trigger -->|3. Append Row| G_Sheet
-
-    App <-->|4. 일정 Read/Write| G_Cal
-
-`}/>
+<Mermaid chart={chartCode} />
 
 ---
 
