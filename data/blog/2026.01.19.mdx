@@ -1,0 +1,138 @@
+---
+title: '상용 육아 앱은 데이터를 가두니까, 2026년형 가족 ERP를 직접 설계했다'
+date: '2026-01-19'
+lastmod: '2026-01-19'
+tags: ['Expo', 'Supabase', 'Google Sheets API', 'Architecture', 'Toy Project']
+draft: false
+summary: '구글 시트를 DB로 쓰고 Expo로 배포하는, 세상에서 가장 프라이빗한 가족 앱(OHANA) 아키텍처 설계 기록.'
+images: ['/static/images/ohana-architecture-v1.png']
+---
+
+import Mermaid from './components/Mermaid'
+
+## 👶 Introduction
+
+**"우리 도현이 저번 예방접종 언제 맞았지?", "이번 달 생활비 얼마나 남았어?"**
+
+아이를 키우기 시작하면서, 가족의 데이터는 생각보다 빠르게 흩어지기 시작했다.
+예방접종 기록은 병원 앱에, 수유 기록은 육아 앱에, 가계부는 엑셀에, 일정은 캘린더에.
+
+문제는 단순했지만 심각했다.
+
+- 🧩 **파편화:** 데이터는 여기저기 흩어져 있고
+- 🔒 **종속성:** 앱 서비스는 언제든 종료될 수 있으며
+- 🚫 **통제권 부재:** 정작 **내 가족의 데이터에 대한 소유권은 내가 갖고 있지 않았다.**
+
+시중의 육아 앱들은 기능이 많고 친절하다. 하지만 대부분의 데이터는 서비스 내부 DB에 갇혀 있고(Vendor Lock-in), 내보내기(export)는 제한적이거나 형식이 불편하다.
+
+그래서 결론은 하나였다.
+
+> **“가족 데이터는 서비스가 아니라, 내가 직접 소유해야 한다.”**
+
+와이프와 나, 그리고 우리 아기 도현이를 위한 **Private Family ERP — Project OHANA**를 직접 설계하기로 했다.
+
+### 🎯 핵심 목표
+
+1.  **데이터 주권:** 최종 저장소는 **Google Sheets(내 계정)**
+2.  **사용성:** 기존 육아 앱보다 **단순하게 (One-Tap)**
+3.  **유지보수:** 서버 운영 부담 **Zero (Serverless)**
+
+---
+
+## 🏗️ Body
+
+### 1. The Core Philosophy: "No Vendor Lock-in"
+
+이 프로젝트의 제1원칙은 **데이터 소유권**이다.
+앱이 사라져도, 서버가 종료되어도, 아이의 성장 기록과 가족의 가계 데이터는 `xlsx` 파일로 남아야 한다.
+
+그래서 구조를 과감하게 단순화했다.
+
+- **Logic:** 앱은 거들 뿐. 입력과 조회만 담당하며 비즈니스 로직은 최소화한다.
+- **Storage:** 모든 최종 데이터는 **Google Sheets**에 저장한다.
+- **Schedule:** 별도의 일정 DB를 두지 않는다. **Google Calendar 자체를 DB로 사용한다.**
+
+Google 계정만 있으면 언제든 엑셀로 열고, 필터링하고, 백업할 수 있다. 특정 벤더나 서비스에 내 추억을 저당 잡히지 않는다.
+
+---
+
+### 2. UX Strategy: "One-Handed & One-Tap"
+
+육아 중에 앱을 쓰는 상황은 매우 제한적이다. **한 손은 아이를 안고 있고, 다른 한 손으로 1초 안에 기록해야 한다.**
+
+기존 앱들의 `메뉴 → 진입 → 선택 → 시간 설정 → 저장` (4단계) 플로우는 현실 육아에서 사치다.
+**Project OHANA**의 UX 목표는 단순하다. 앱을 켜자마자 보이는 버튼 하나면 충분하다.
+
+<div className="my-6 flex items-center justify-center gap-4 rounded-xl bg-gray-100 p-4 dark:bg-gray-800">
+  <div className="rounded-full bg-blue-500 px-6 py-3 font-bold text-white shadow-md">🍼 160ml</div>
+  <div className="rounded-full bg-yellow-500 px-6 py-3 font-bold text-white shadow-md">
+    💩 기저귀
+  </div>
+  <div className="rounded-full bg-indigo-500 px-6 py-3 font-bold text-white shadow-md">💤 수면</div>
+</div>
+
+이 버튼 하나를 누르면 **0.1초 내 기록 완료**. 상세 수정은 나중에 웹이나 시트에서 하면 된다.
+
+---
+
+### 3. Architecture: The 2026 Hybrid Stack
+
+최신 모바일 스택을 공부(Study)하는 목적도 있지만, **백엔드 운영의 고통을 없애는 것**이 최우선이다.
+
+핵심 전략은 **"클라이언트는 가볍게, 동기화는 Supabase에, 저장은 Google에"** 맡기는 것이다.
+
+#### 🛠️ Tech Stack
+
+- 📱 **App Framework: Expo SDK (Latest)**
+  - React Native New Architecture 기반.
+  - Next.js 경험을 살려 `Expo Router`와 `NativeWind`를 사용한다.
+- ⚡ **Sync Engine: Supabase**
+  - 부부 간 실시간 동기화(Realtime Sync) 전용 레이어.
+  - 데이터를 영구 보관하지 않고, **중간 버퍼 + 이벤트 트리거** 역할만 수행한다.
+- 📊 **Data Warehouse: Google Sheets & Calendar**
+  - Supabase에 데이터가 들어오면 Edge Function이 트리거된다.
+  - Google Sheets API를 통해 최종적으로 행(Row)을 추가한다.
+
+Supabase는 빠르고 편리하지만, **데이터의 최종 목적지는 항상 Google이다.**
+
+---
+
+#### 📐 Data Flow Diagram
+
+전체 데이터 흐름과 아키텍처는 다음과 같다.
+
+<Mermaid chart={`
+graph TD
+    subgraph Client [📱 Mobile App]
+        App[One-Tap UI]
+    end
+
+    subgraph Fast_Layer [⚡ Sync Layer]
+        Supa_DB[(Supabase DB)]
+        Trigger[⚡ Edge Function]
+    end
+
+    subgraph Google_Eco [🌐 Storage Layer]
+        G_Sheet[📊 Google Sheets<br/>(Main DB)]
+        G_Cal[📅 Google Calendar<br/>(Schedule DB)]
+    end
+
+    %% Flow
+    App -->|1. 기록 (Realtime)| Supa_DB
+    Supa_DB -->|2. 자동 백업 (Trigger)| Trigger
+    Trigger -->|3. Append Row| G_Sheet
+
+    App <-->|4. 일정 Read/Write| G_Cal
+
+`}/>
+
+---
+
+## 🚀 What's Next?
+
+이 프로젝트는 단순한 앱 개발이 아니다. **가장 소중한 가족의 데이터를 가장 안전하고 효율적으로 관리하려는 시도**다.
+
+설계는 끝났다. 이제 코드를 작성할 시간이다.
+다음 포스팅에서는 **Google Cloud Platform (GCP) API 설정과 Expo 초기 세팅 과정**을 다루겠다.
+
+개발자 아빠의 도전은 이제 시작이다.
