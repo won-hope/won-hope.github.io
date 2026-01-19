@@ -1,32 +1,32 @@
-"use client"; // Next.js App Router 사용 시 필수
+'use client'
 
-import React, { useEffect, useRef } from "react";
-import mermaid from "mermaid";
+import React, { useEffect, useRef } from 'react'
+import mermaid from 'mermaid'
 
 mermaid.initialize({
   startOnLoad: true,
-  theme: "default", // or 'dark', 'forest', 'neutral'
-  securityLevel: "loose",
-});
+  theme: 'default',
+  securityLevel: 'loose',
+})
 
 interface MermaidProps {
-  chart: string;
+  chart: string
 }
 
 const Mermaid = ({ chart }: MermaidProps) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (ref.current) {
-      mermaid.contentLoaded(); // 렌더링 트리거
+      mermaid.contentLoaded()
     }
-  }, [chart]);
+  }, [chart])
 
   return (
     <div className="mermaid" ref={ref}>
       {chart}
     </div>
-  );
-};
+  )
+}
 
-export default Mermaid;
+export default Mermaid
