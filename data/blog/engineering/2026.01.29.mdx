@@ -1,0 +1,96 @@
+---
+title: '2026년형 가족 ERP 프로젝트 진행 기록 — 어디까지 왔고, 이제 무엇을 만들까'
+date: '2026-01-27'
+lastmod: '2026-01-27'
+tags: ['Expo', 'Supabase', 'Google OAuth', 'Push Notification', 'Dev Log', 'Engineering']
+draft: false
+summary: 'Project OHANA 개발 중간 점검. 모바일 환경 구축부터 인증·푸시 연동까지 완료된 마일스톤과, 앞으로 구현해야 할 핵심 로드맵.'
+---
+
+## 🧭 들어가며: 길을 잃지 않기 위하여
+
+사이드 프로젝트를 진행하다 보면 가장 위험한 순간은 **“지금 내가 뭘 해놨는지, 다음에 뭘 해야 하는지 헷갈리기 시작할 때”**다.
+기능 하나 구현하다가 갑자기 리팩토링에 빠지거나, 배포 설정만 3일 내내 만지작거리는 늪에 빠지기 십상이다.
+
+그래서 이 글은 기능 설명서가 아니다.
+**Project OHANA가 현재 어디까지 와 있는지**를 점검하는 '개발 마일스톤'이다.
+
+> **“이미 끝낸 일(Done)”과 “아직 하지 않은 일(To-Do)”을 명확히 나누는 것.**
+> 이것만으로도 프로젝트의 절반은 성공이다.
+
+---
+
+## ✅ Milestone 1: Foundation (완료된 작업들)
+
+지금까지의 작업은 **'흔들리지 않는 기반'**을 만드는 데 집중했다.
+
+### 1. 기준선(Baseline) 확정
+코드를 한 줄도 짜기 전에, **"하지 않을 것"**을 먼저 정했다. 이 기준 덕분에 기술 선택의 피로도를 줄일 수 있었다.
+
+- **No Vendor Lock-in:** 상용 육아 앱의 데이터 락인 문제 해결.
+- **Data Sovereignty:** 최종 데이터는 내 구글 드라이브(Sheets)에 둔다.
+- **Thin Client:** 앱은 비즈니스 로직 없이 입력과 조회만 담당한다.
+
+### 2. Modern Mobile Environment
+2026년 기준, 가장 생산성 높은 모바일 스택을 구축했다.
+
+- **Expo SDK 54 & Expo Router:** `app/` 디렉터리 구조가 곧 화면 설계도가 되도록 파일 시스템 라우팅을 적용했다.
+- **Dev Client 도입:** Expo Go의 한계를 넘어서기 위해 초기부터 Development Build 환경을 구축했다.
+
+### 3. Clean Architecture (UI / Infra 분리)
+나중에 코드가 엉키지 않도록 폴더 구조에 강제성을 부여했다.
+
+- `app/`: 화면과 라우팅 (View Layer)
+- `src/lib/`: Supabase, Auth, Push 등 (Infrastructure Layer)
+
+> **"UI는 얇게, 인프라는 독립적으로."**
+> 이 원칙은 나중에 이 앱을 웹으로 확장하거나, 백엔드를 교체하더라도 유효할 것이다.
+
+### 4. Security First
+토이 프로젝트라고 보안을 대충 하지 않았다. **"당장 내일 코드를 오픈소스로 공개해도 문제없는 상태"**가 기준이다.
+
+- `EXPO_PUBLIC_*` 외의 모든 Secret은 Git에서 제외.
+- Supabase `service_role` Key는 앱 번들링에서 원천 배제.
+
+### 5. Supabase & Google OAuth
+Supabase를 백엔드가 아닌 **'인증 및 동기화 미들웨어'**로 정의했다.
+
+- **Auth:** Google OAuth를 Supabase가 중계하도록 설정하여, 앱 내에 Google Secret을 심지 않는 안전한 구조를 완성했다.
+- **Sync:** 부부 간 데이터 동기화를 위한 세션 관리 준비 완료.
+
+### 6. Push Notification Pipeline
+가장 까다로운 부분이었던 Android 푸시 알림 환경을 구축했다.
+
+- Expo SDK 53+ 정책 변화에 맞춰 `eas init`으로 Project ID 발급 완료.
+- 실기기에서 Push Token이 정상적으로 발급되는 것을 확인했다.
+- 이제 언제든 서버에서 알림을 쏘면 내 폰이 울린다.
+
+---
+
+## 🚀 Milestone 2: What's Next (해야 할 일들)
+
+기반 공사는 끝났다. 이제 **Project OHANA의 '진짜 기능'**을 얹을 차례다.
+다음 스프린트의 목표는 다음과 같다.
+
+### 1. Supabase Edge Function 구현 ⚡
+앱에서 데이터를 쏘면, 중간에서 가로채 처리할 서버리스 함수가 필요하다.
+- 심부름 요청이 들어오면 → 상대방에게 푸시 알림 발송 (Trigger)
+- 동시에 Google Sheets API 호출 (Archiving)
+
+### 2. Google Sheets API 연동 📊
+이 프로젝트의 핵심인 **'데이터 소유권'**을 완성하는 단계다.
+- `xlsx` 파일에 육아 기록과 가계부 내역이 자동으로 한 줄씩 쌓이도록 구현한다.
+
+### 3. One-Tap UI 개발 📱
+기술적인 연동이 끝나면, 와이프가 실제로 쓸 화면을 그린다.
+- 한 손으로(엄지로) 1초 만에 기저귀/수유/심부름을 등록하는 UX 구현.
+
+---
+
+## 📝 Outro
+
+**설계는 끝났고, 도구는 준비됐다.**
+이제 남은 건, 이 파이프라인에 실제 데이터를 흐르게 하는 것뿐이다.
+
+다음 기록은 **"Supabase Edge Function으로 푸시 쏘고 엑셀에 저장하기"**가 될 것이다.
+가장 재미있는 구간에 진입했다.
