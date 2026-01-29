@@ -1,1 +1,8 @@
-{}
+{
+  "expo": 1,
+  "supabase": 1,
+  "google-sheets-api": 1,
+  "architecture": 1,
+  "toy-project": 1,
+  "life": 1
+}
