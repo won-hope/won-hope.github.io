@@ -1,0 +1,202 @@
+---
+title: '[OHANA] Family ERP: 편한 길(BaaS)을 버리고 Spring Boot로 회귀한 이유'
+date: '2026-02-01'
+lastmod: '2026-02-01'
+tags:
+  ['Spring Boot', 'Kotlin', 'System Design', 'Event-Driven', 'Google Calendar API', 'Refactoring']
+draft: false
+summary: 'Expo와 Supabase로 시작했던 프로젝트를, 데이터 주권과 백엔드 아키텍처 설계를 위해 Native Android & Spring Boot로 전면 재설계한 기록.'
+images: ['/static/images/ohana-architecture-v2.png', '/static/images/ohana-database-erd.png']
+---
+
+## 👶 Introduction
+
+**“우리 도현이 다음 예방접종 언제지?”  
+“여보, 퇴근할 때 기저귀랑 분유 좀 사 와.”**
+
+아이를 키우기 시작하면서 가족의 정보와 태스크는 빠르게 흩어진다.  
+예방접종은 병원 앱에, 수유 기록은 육아 앱에,  
+심부름은 카카오톡에, 일정은 캘린더에.
+
+문제는 단순한 불편함이 아니었다.
+
+- 🧩 **데이터 파편화:** 가족의 중요한 기록이 여러 서비스에 흩어져 제어할 수 없다.
+- 🔔 **알림의 휘발성:** 카톡으로 받은 심부름은 대화에 묻혀 잊혀지기 쉽다.
+- 🚫 **데이터 주권 부재:** 정작 *내 가족의 데이터*를 내가 온전히 소유하지 못한다.
+
+그래서 결론을 내렸다.  
+**“남이 만든 서비스를 더 쓰는 대신, 가족을 위한 ERP를 직접 만들자.”**
+
+---
+
+## 🔄 The Pivot: 왜 다시 ‘백엔드’인가?
+
+사실 초기 기획은 **Expo + Supabase** 조합이었다.  
+BaaS(Backend as a Service)를 사용해 빠르게 MVP를 만들고 배포하는 것이 효율적이라 판단했다.  
+하지만 개발을 진행할수록 마음 한구석에서 **‘엔지니어로서의 갈증’**이 올라왔다.
+
+> “제공해주는 API만 조립해서 만드는 것이,  
+> 과연 내가 원하는 시스템인가?”
+
+나는 단순한 ‘앱 제작자’가 아니라  
+**‘시스템을 설계하는 백엔드 엔지니어’**로서 성장하고 싶었다.  
+가족의 복잡한 삶을 코드로 추상화하고,  
+데이터 흐름을 끝까지 통제하고 싶었다.
+
+그래서 과감하게  
+**편한 길(Supabase)을 버리고, 견고한 길(Spring Boot)**로 선회했다.
+
+### 🛠️ Tech Stack Pivot
+
+- **Client:** Expo(Cross Platform) → **Native Android (Kotlin)**  
+  _Android 백그라운드 처리와 알림 채널을 정밀하게 제어하기 위해_
+- **Server:** Supabase → **Spring Boot + Kotlin**  
+  _복잡한 도메인 로직과 배치·이벤트 기반 아키텍처 구현을 위해_
+
+---
+
+## 🏗️ Architecture V2: Private & Google-Centric
+
+새롭게 설계된 아키텍처의 핵심은  
+**“상태 변화(Event)와 영구 기록(Storage)의 분리”**다.
+
+OHANA 서버는 비즈니스 로직을 처리하는 두뇌 역할을 하고,  
+실제 데이터의 물리적 저장소는 사용자의  
+**Google Calendar와 Google Sheets**를 활용한다.
+
+이를 통해  
+**“서버가 사라져도 데이터는 남는 구조”**를 완성했다.
+
+![OHANA Family ERP Architecture v2](/static/images/ohana-architecture-v2.png)
+_(Spring Boot가 중심에서 이벤트를 조율하고, Google 생태계와 동기화되는 구조)_
+
+### 핵심 설계 포인트
+
+1. **Event-Driven Core**  
+   앱에서 발생하는 모든 액션(수유, 심부름 등)은 이벤트로 발행되어 비동기로 전파된다.
+
+2. **Daily Batch Scheduler**  
+   실시간성이 중요하지 않은 로그성 데이터(수유 기록)는  
+   매일 **00:10(KST)** 배치로 돌아 Google Sheets에 적재된다.
+
+3. **Authentication**  
+   자체 계정 없이 **100% Google OAuth**를 사용해 인증 보안 부담을 제거했다.
+
+---
+
+### 🧠 Why Google as Storage?
+
+Google Calendar와 Google Sheets를 저장소로 선택한 이유는  
+단순한 편의성이 아니다.
+
+이 프로젝트의 출발점은 항상  
+**데이터 주권(Data Ownership)** 이었다.
+
+상용 육아 앱들은 대부분 데이터를 내부 DB에 저장한다.  
+서비스가 종료되거나 정책이 바뀌면,  
+사용자는 자신의 기록을 온전히 가져오기 어렵다.
+
+OHANA는 반대로 접근했다.
+
+- Google은 **10년 후에도 접근 가능할 확률이 매우 높은 플랫폼**이다.
+- Calendar와 Sheets는 사실상 **범용 포맷**이다.
+- 별도의 마이그레이션 없이도 데이터는 그대로 남는다.
+
+즉, OHANA에서 말하는 Storage는  
+**“가장 빠른 DB”가 아니라 “가장 오래 살아남을 저장소”**다.
+
+> 서버는 교체될 수 있지만,  
+> 가족의 기록은 그래서는 안 된다.
+
+---
+
+### ⚙️ Why Event-Driven?
+
+OHANA에서 하나의 액션은 단순한 CRUD가 아니다.
+
+예를 들어, 수유 기록 하나를 저장하면 다음 일이 함께 발생한다.
+
+- 수유 기록 저장
+- 가족 타임라인 갱신
+- 알림 대상 계산
+- (다음 날) Google Sheets 배치 집계 대상 포함
+
+이 모든 책임을 하나의 트랜잭션에서 처리하면  
+결국 비대한 서비스 메서드가 된다.
+
+그래서 OHANA는  
+**상태 변화 자체를 이벤트로 분리**했다.
+
+> 수유 기록 = `FEEDING_RECORDED` 이벤트
+
+이벤트는 비동기로 전파되고,  
+각 컴포넌트는 자신의 책임만 수행한다.
+
+---
+
+## 🗄️ Domain Modeling (ERD)
+
+단순한 CRUD 앱을 넘어  
+**확장성(Extensibility)**을 고려해 도메인을 설계했다.
+
+특히 ‘아기’와 ‘반려동물’을 별도 테이블로 나누지 않고,  
+**`Subject`라는 상위 개념으로 추상화**한 것이 특징이다.
+
+![OHANA Database ERD](/static/images/ohana-database-erd.png)
+_(Group 중심의 멀티테넌트 구조와 Subject 추상화)_
+
+### 주요 모델링 전략
+
+- **Multi-Tenancy (Group)**  
+  `Group`을 최상위에 두어 가족 간 데이터가 철저히 격리된다.
+
+- **Polymorphic Subject**  
+  `Subject` 하나로 BABY / PET을 모두 관리하며,  
+  추후 확장이 용이하다.
+
+- **Event Sourcing**  
+  모든 변경은 `Event`로 기록되며,  
+  알림(`Notification`)과 배치 작업의 트리거로 사용된다.
+
+---
+
+### 🧮 Why Batch, Not Realtime?
+
+수유 기록은 **실시간성이 중요한 데이터가 아니다.**  
+중요한 것은 “즉각 반영”이 아니라  
+**정확한 누적과 장기 보관**이다.
+
+실시간 Google Sheets API 호출은  
+API quota 소모와 실패 복구 복잡도를 증가시킨다.
+
+그래서 OHANA는 수유 기록을  
+**하루 단위 배치 처리**로 설계했다.
+
+- 기준 시간대: KST
+- 실행 시각: 매일 **00:10**
+- 전날 기록을 한 번에 집계하여 적재
+
+성능보다  
+**운영 안정성과 재처리 가능성**을 우선한 선택이다.
+
+---
+
+## 🚀 Why This Matters
+
+이 프로젝트는  
+“얼마나 빨리 만드느냐”가 아니라  
+**“얼마나 제대로 만드느냐”**에 대한 도전이다.
+
+남들이 만들어둔 블록을 조립하는 대신,  
+직접 **코틀린으로 뼈대를 세우고,  
+스프링으로 혈관을 연결하는 길**을 택했다.
+
+개발 기간은 늘어나겠지만,  
+그만큼 **백엔드 엔지니어로서의 밀도**는 높아질 것이다.
+
+### 🔜 Next Step
+
+설계는 끝났다. 이제 구현이다.  
+다음 글에서는  
+**Spring Security + Google OAuth 2.0으로  
+세션 없는 인증 구조를 설계하고 구현한 과정**을 다룰 예정이다.

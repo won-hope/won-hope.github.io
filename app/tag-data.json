@@ -1,8 +1,12 @@
 {
-  "expo": 1,
-  "supabase": 1,
+  "expo": 2,
+  "supabase": 2,
   "google-sheets-api": 1,
   "architecture": 1,
   "toy-project": 1,
+  "google-oauth": 1,
+  "push-notification": 1,
+  "dev-log": 1,
+  "engineering": 1,
   "life": 1
 }

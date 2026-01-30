@@ -44,17 +44,19 @@ const icon = fromHtmlIsomorphic(
 
 const computedFields: ComputedFields = {
   readingTime: { type: 'json', resolve: (doc) => readingTime(doc.body.raw) },
+
+  // 👇 여기부터 3개를 이걸로 교체해!
   slug: {
     type: 'string',
-    resolve: (doc) => doc._raw.flattenedPath.replace(/^.+?(\/)/, ''),
+    resolve: (doc) => doc._raw.flattenedPath.replace(/^.+?(\/|\\)/, '').replace(/\\/g, '/'),
   },
   path: {
     type: 'string',
-    resolve: (doc) => doc._raw.flattenedPath,
+    resolve: (doc) => doc._raw.flattenedPath.replace(/\\/g, '/'),
   },
   filePath: {
     type: 'string',
-    resolve: (doc) => doc._raw.sourceFilePath,
+    resolve: (doc) => doc._raw.sourceFilePath.replace(/\\/g, '/'),
   },
   toc: { type: 'json', resolve: (doc) => extractTocHeadings(doc.body.raw) },
 }
