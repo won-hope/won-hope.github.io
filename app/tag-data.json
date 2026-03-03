@@ -1,12 +1,18 @@
 {
+  "spring-boot": 1,
+  "kotlin": 1,
+  "system-design": 1,
+  "event-driven": 1,
+  "google-calendar-api": 1,
+  "refactoring": 1,
   "expo": 2,
   "supabase": 2,
-  "google-sheets-api": 1,
-  "architecture": 1,
-  "toy-project": 1,
   "google-oauth": 1,
   "push-notification": 1,
   "dev-log": 1,
   "engineering": 1,
+  "google-sheets-api": 1,
+  "architecture": 1,
+  "toy-project": 1,
   "life": 1
 }
